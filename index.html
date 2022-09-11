@@ -5,8 +5,7 @@
         body {
             background-color: black;
             color: white;
-            text-transform: uppercase;
-            font: 19px monospace;
+            font: 19px monospace, monospace;
         }
 
         div {
@@ -38,11 +37,11 @@
     <script>
         function onload() {
             setTimeout(() => {
-                const letters = prompt('letters').split('');
+                const letters = prompt('letters').toUpperCase().split('');
                 document.body.innerHTML = `<div>${letters.map(l => `<b>${l}</b>`).join('')}</div><div id="lists"></div>`;
-                let newWord = true, l = letters.length;
-                while (newWord) {
-                    let word = prompt('word'), opt = letters.slice(), s = new Set(), indexes = [];
+                let word = prompt('word').toUpperCase(), l = letters.length;
+                while (word) {
+                    let opt = letters.slice(), s = new Set(), indexes = [];
                     for (const c of word)
                         if (c !== ' ')
                             opt.splice(opt.indexOf(c), 1);
@@ -63,7 +62,7 @@
                         list += `<li>${comb}</li>`;
                     }
                     document.getElementById('lists').innerHTML += list + '</ul>';
-                    newWord = confirm('new word?');
+                    word = prompt('word').toUpperCase();
                 }
             }, 0);
         }
