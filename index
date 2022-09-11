@@ -1,0 +1,77 @@
+<html>
+
+<head>
+    <style>
+        body {
+            background-color: black;
+            color: white;
+            text-transform: uppercase;
+            font: 19px monospace;
+        }
+
+        div {
+            display: flex;
+        }
+
+        b {
+            border: 3px solid;
+            width: 30px;
+            text-align: center;
+            height: 30px;
+            margin: 3px;
+            border-radius: 50%;
+            font-size: 25px;
+        }
+
+        ul {
+            list-style: decimal-leading-zero inside;
+        }
+
+        span {
+            border: 2px solid;
+            width: 20px;
+            text-align: center;
+            height: 20px;
+            margin: 2px;
+        }
+    </style>
+    <script>
+        function onload() {
+            setTimeout(() => {
+                const letters = prompt('letters').split('');
+                document.body.innerHTML = `<div>${letters.map(l => `<b>${l}</b>`).join('')}</div><div id="lists"></div>`;
+                let newWord = true, l = letters.length;
+                while (newWord) {
+                    let word = prompt('word'), opt = letters.slice(), s = new Set(), indexes = [];
+                    for (const c of word)
+                        if (c !== ' ')
+                            opt.splice(opt.indexOf(c), 1);
+                    let o = opt.length, e = word.length + o - l, code = '', list = '<ul><div>';
+                    for (let i = 0; i < e; i++) {
+                        let index = 'i' + i;
+                        indexes.push(index);
+                        code += `for(let ${index} = 0; ${index} < ${o}; ${index}++) `;
+                    }
+                    code += `if(new Set([${indexes.join()}]).size == ${e}) s.add(`;
+                    for (const c of word) {
+                        code += (c === ' ' ? `opt[${indexes.shift()}]` : `'${c}'`) + '+';
+                        list += `<span>${c}</span>`;
+                    }
+                    eval(code.slice(0, -1) + ')');
+                    list += '</div>';
+                    for (let comb of s) {
+                        list += `<li>${comb}</li>`;
+                    }
+                    document.getElementById('lists').innerHTML += list + '</ul>';
+                    newWord = confirm('new word?');
+                }
+            }, 0);
+        }
+    </script>
+</head>
+
+<body onload="onload()">
+
+</body>
+
+</html>
