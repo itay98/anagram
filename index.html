@@ -5,7 +5,7 @@
         body {
             background-color: black;
             color: white;
-            font: 22px monospace;
+            font: 22px 'Courier New';
             margin: 0;
         }
 
@@ -16,13 +16,27 @@
 
         b {
             border: 3px solid;
-            text-align: center;
             height: 40px;
             margin: 3px;
             border-radius: 20px;
-            font-size: 25px;
             box-sizing: border-box;
             padding: 3px;
+        }
+
+        span {
+            width: 20px;
+            height: 20px;
+            margin: 2px;
+            line-height: 0.95;
+            background-color: white;
+            color: black;
+            font-weight: bold;
+        }
+
+        b,
+        span {
+            text-align: center;
+            font-size: 25px;
         }
 
         #buttons {
@@ -57,15 +71,6 @@
 
         #lists {
             top: 50px;
-        }
-
-        span {
-            border: 2px solid;
-            width: 20px;
-            text-align: center;
-            height: 20px;
-            margin: 2px;
-            line-height: 1;
         }
     </style>
     <script>
