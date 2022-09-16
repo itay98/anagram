@@ -5,25 +5,58 @@
         body {
             background-color: black;
             color: white;
-            font: 19px Consolas;
+            font: 22px monospace;
+            margin: 0;
         }
 
         div {
             display: flex;
+            position: absolute;
         }
 
         b {
             border: 3px solid;
-            width: 30px;
             text-align: center;
-            height: 30px;
+            height: 40px;
             margin: 3px;
-            border-radius: 50%;
+            border-radius: 20px;
             font-size: 25px;
+            box-sizing: border-box;
+            padding: 3px;
+        }
+
+        #buttons {
+            width: 300px;
+            justify-content: space-evenly;
+            top: 5;
+        }
+
+        #buttons b {
+            cursor: pointer;
+            padding: 3px 9px;
+        }
+
+        #letters {
+            justify-content: center;
+            position: absolute;
+            left: 300px;
+            top: 5;
         }
 
         ul {
             list-style: decimal-leading-zero inside;
+        }
+
+        ul div {
+            position: relative;
+        }
+
+        #letters b {
+            width: 40px;
+        }
+
+        #lists {
+            top: 50px;
         }
 
         span {
@@ -32,45 +65,52 @@
             text-align: center;
             height: 20px;
             margin: 2px;
+            line-height: 1;
         }
     </style>
     <script>
-        function onload() {
+        let letters;
+        function init() {
             setTimeout(() => {
-                const letters = prompt('letters').toUpperCase().split('');
-                document.body.innerHTML = `<div>${letters.map(l => `<b>${l}</b>`).join('')}</div><div id="lists"></div>`;
-                let word = prompt('word').toUpperCase(), l = letters.length;
-                while (word) {
-                    let opt = letters.slice(), s = new Set(), indexes = [];
-                    for (const c of word)
-                        if (c !== ' ')
-                            opt.splice(opt.indexOf(c), 1);
-                    let o = opt.length, e = word.length + o - l, code = '', list = '<ul><div>';
-                    for (let i = 0; i < e; i++) {
-                        let index = 'i' + i;
-                        indexes.push(index);
-                        code += `for(let ${index} = 0; ${index} < ${o}; ${index}++) `;
-                    }
-                    code += `if(new Set([${indexes.join()}]).size == ${e}) s.add(`;
-                    for (const c of word) {
-                        code += (c === ' ' ? `opt[${indexes.shift()}]` : `'${c}'`) + '+';
-                        list += `<span>${c}</span>`;
-                    }
-                    eval(code.slice(0, -1) + ')');
-                    list += '</div>';
-                    for (let comb of s) {
-                        list += `<li>${comb}</li>`;
-                    }
-                    document.getElementById('lists').innerHTML += list + '</ul>';
-                    word = prompt('word').toUpperCase();
-                }
+                letters = prompt('letters').toUpperCase().split('');
+                document.getElementById('letters').innerHTML = letters.map(l => `<b>${l}</b>`).join('');
+                addWord();
             }, 0);
+        }
+        function addWord() {
+            let word = prompt('word').toUpperCase(), opt = letters.slice(), s = new Set(), indexes = [];
+            for (const c of word)
+                if (c !== ' ')
+                    opt.splice(opt.indexOf(c), 1);
+            let o = opt.length, e = word.length + o - letters.length, code = '', list = '<ul><div>';
+            for (let i = 0; i < e; i++) {
+                let index = 'i' + i;
+                indexes.push(index);
+                code += `for(let ${index} = 0; ${index} < ${o}; ${index}++) `;
+            }
+            code += `if(new Set([${indexes.join()}]).size == ${e}) s.add(`;
+            for (const c of word) {
+                code += (c === ' ' ? `opt[${indexes.shift()}]` : `'${c}'`) + '+';
+                list += `<span>${c}</span>`;
+            }
+            eval(code.slice(0, -1) + ')');
+            list += '</div>';
+            for (let comb of s) {
+                list += `<li>${comb}</li>`;
+            }
+            document.getElementById('lists').innerHTML += list + '</ul>';
+        }
+        function reset() {
+            document.getElementById('lists').innerHTML = document.getElementById('letters').innerHTML = '';
+            init();
         }
     </script>
 </head>
 
-<body onload="onload()">
-
+<body onload="init()">
+    <div id="buttons"><b onclick="reset()">reset</b><b onclick="addWord()">add word</b></div>
+    <div id="letters"></div>
+    <div id="lists"></div>
 </body>
 
 </html>
