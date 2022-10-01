@@ -5,50 +5,35 @@
         body {
             background-color: black;
             color: white;
-            font: 22px 'Courier New';
+            font: 25px 'Courier New';
             margin: 0;
         }
 
         div {
             display: flex;
-            position: absolute;
         }
 
         b {
-            box-sizing: border-box;
-            padding: 3px;
-        }
-
-        span {
             width: 20px;
             height: 20px;
             margin: 2px;
             line-height: 0.95;
             background-color: white;
             color: black;
-            font-weight: bold;
         }
 
         input {
             background-color: inherit;
             color: inherit;
-            font-family: inherit;
+            font: inherit;
+            border: 2px solid;
+            border-radius: 10px;
+            margin-top: 5px;
         }
 
         b,
-        input {
-            border: 3px solid;
-            height: 40px;
-            margin: 3px;
-            border-radius: 20px;
-
-        }
-
-        b,
-        span,
         input {
             text-align: center;
-            font-size: 25px;
             text-indent: -1px;
         }
 
@@ -56,83 +41,91 @@
             color: yellow;
         }
 
-        #inputs {
-            width: 400px;
-            justify-content: space-evenly;
-            top: 5;
+        #header>* {
+            margin-left: 20px;
         }
 
-        #letters {
-            justify-content: center;
-            position: absolute;
-            left: 400px;
-            top: 5;
+        #word {
+            margin-top: 9px;
         }
 
-        ul {
-            list-style: decimal-leading-zero inside;
+        #perm {
+            margin-top: 8px;
         }
 
-        ul div {
-            position: relative;
+        #list {
+            font-size: 22px;
+            flex-wrap: wrap;
         }
 
-        #letters b {
-            width: 40px;
-        }
-
-        #lists {
-            top: 50px;
+        #list span {
+            margin: 8px;
         }
     </style>
     <script>
-        let letters, lettersDiv, listsDiv, lettersInput, wordInput;
+        let letters, opt, word, e, s = new Set(), wordDiv, permDiv, listDiv, lettersInput, wordInput;
         function init() {
-            lettersDiv = document.getElementById('letters');
-            listsDiv = document.getElementById('lists');
-            [lettersInput, wordInput] = document.querySelectorAll('input');
-            lettersInput.focus();
-        }
-        function addWord() {
-            let word = wordInput.value.toUpperCase(), opt = letters.slice(), s = new Set(), indexes = [];
-            wordInput.value = '';
-            for (const c of word)
-                if (c !== ' ')
-                    opt.splice(opt.indexOf(c), 1);
-            let o = opt.length, e = word.length + o - letters.length, code = '', list = '<ul><div>';
-            for (let i = 0; i < e; i++) {
-                let index = 'i' + i;
-                indexes.push(index);
-                code += `for(let ${index} = 0; ${index} < ${o}; ${index}++) `;
-            }
-            code += `if(new Set([${indexes.join()}]).size == ${e}) s.add(`;
-            for (const c of word) {
-                code += (c === ' ' ? `opt[${indexes.shift()}]` : `'${c}'`) + '+';
-                list += `<span>${c}</span>`;
-            }
-            eval(code.slice(0, -1) + ')');
-            list += '</div>';
-            for (let comb of s) {
-                list += `<li>${comb}</li>`;
-            }
-            listsDiv.innerHTML += list + '</ul>';
+            wordDiv = document.getElementById('word');
+            permDiv = document.getElementById('perm');
+            listDiv = document.getElementById('list');
+            [lettersInput, wordInput] = document.querySelectorAll('input'); lettersInput.focus()
         }
         function setLetters() {
             letters = lettersInput.value.toUpperCase().split('');
+            wordDiv.innerHTML = permDiv.innerText = listDiv.innerHTML = '';
             wordInput.focus();
-            listsDiv.innerHTML = lettersInput.value = '';
-            lettersDiv.innerHTML = letters.map(l => `<b>${l}</b>`).join('');
+        }
+        function setWord() {
+            word = wordInput.value.toUpperCase();
+            wordInput.value = listDiv.innerHTML = '';
+            opt = letters.slice();
+            let wordHtml = '';
+            for (const c of word) {
+                if (c !== ' ')
+                    opt.splice(opt.indexOf(c), 1);
+                wordHtml += `<b>${c}</b>`;
+            }
+            wordDiv.innerHTML = wordHtml;
+            let is = new Set(), o = opt.length;
+            for (let i = 0; i < o; i++)
+                is.add(i);
+            e = word.length + o - letters.length;
+            for (let i = 0; i < o; i++)
+                buildWord(i, [], is);
+            permDiv.innerText = 'P=' + s.size;
+            if (s.size < 250) {
+                let list = '';
+                for (let perm of s) {
+                    list += `<span>${perm}</span>`;
+                }
+                listDiv.innerHTML = list;
+            }
+            s = new Set();
+        }
+        function buildWord(index, ia, is) {
+            ia.push(index);
+            if (ia.length == e) {
+                let perm = '';
+                for (const c of word)
+                    perm += c === ' ' ? opt[ia.shift()] : c;
+                s.add(perm);
+            } else {
+                is = new Set(is);
+                is.delete(index);
+                is.forEach(i => buildWord(i, ia.slice(), is));
+            }
         }
     </script>
 </head>
 
 <body onload="init()">
-    <div id="inputs">
-        <input onchange="setLetters()" placeholder="set letters" style="width:195px" />
-        <input onchange="addWord()" placeholder="add word" style="width:150px" />
+    <div id="header">
+        <input onchange="setLetters()" onfocus="this.select()" placeholder="set letters" style="width:185px" />
+        <input onchange="setWord()" placeholder="set word" style="width:140px" />
+        <div id="word"></div>
+        <div id="perm"></div>
     </div>
-    <div id="letters"></div>
-    <div id="lists"></div>
+    <div id="list"></div>
 </body>
 
 </html>
